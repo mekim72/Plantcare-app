@@ -34,3 +34,20 @@ python -m plantcare.web_server --db ./plantcare.db --host 127.0.0.1 --port 5000
 - `View Plants`: 조회 전용 목록/상세
 - `Add Plant`: 등록 전용 화면
 - `Delete Plant`: 삭제 전용 목록/확인 화면
+
+## GitHub Actions Deployment (PythonAnywhere)
+
+Automatic deployment workflow file has been added:
+
+- `.github/workflows/deploy-pythonanywhere.yml`
+
+Setup guide:
+
+- `PYTHONANYWHERE_GITHUB_ACTIONS.md`
+
+## Railway Deployment
+
+Railway deployment files are included:
+
+- `railway.json`
+- `RAILWAY_DEPLOY.md`

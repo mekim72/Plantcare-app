@@ -1,0 +1,42 @@
+name: Deploy to PythonAnywhere
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PA_SSH_HOST }}
+          username: ${{ secrets.PA_SSH_USER }}
+          key: ${{ secrets.PA_SSH_KEY }}
+          port: ${{ secrets.PA_SSH_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.PA_PROJECT_DIR }}"
+
+            if [ ! -d .git ]; then
+              echo "ERROR: project directory is not a git repository: ${{ secrets.PA_PROJECT_DIR }}"
+              exit 1
+            fi
+
+            git pull --rebase origin main
+
+            if [ ! -d .venv ]; then
+              python -m venv .venv
+            fi
+            source .venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+
+            mkdir -p plantcare_uploads
+
+            # Trigger PythonAnywhere web app reload
+            touch "${{ secrets.PA_WSGI_FILE }}"
