@@ -13,7 +13,4 @@ services:
         value: /var/data/plantcare.db
       - key: PLANTCARE_UPLOAD_DIR
         value: /var/data/uploads
-    disk:
-      name: plantcare-data
-      mountPath: /var/data
-      sizeGB: 1
+
