@@ -134,6 +134,10 @@ def create_app(test_config: Optional[dict] = None) -> Flask:
         alerts = build_alerts(_db(), lookahead_days=1)
         return render_template("dashboard.html", rows=rows, alerts=alerts)
 
+    @app.get("/healthz")
+    def healthz():
+        return {"status": "ok"}, 200
+
     @app.get("/calendar")
     def calendar_view():
         today = date.today()
