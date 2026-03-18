@@ -10,7 +10,7 @@ services:
       - key: PLANTCARE_SECRET_KEY
         generateValue: true
       - key: PLANTCARE_DB
-        value: /var/data/plantcare.db
+        value: /tmp/plantcare.db
       - key: PLANTCARE_UPLOAD_DIR
         value: /tmp/uploads
 
