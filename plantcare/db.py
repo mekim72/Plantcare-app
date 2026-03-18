@@ -193,15 +193,25 @@ def _created_at_date(plant_row: sqlite3.Row) -> date:
     return date.fromisoformat(ts[:10])
 
 
+def _safe_interval(value: Any, default: int) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return default
+    return parsed if parsed > 0 else default
+
+
 def build_dashboard(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     plants = list_plants(conn)
     today = date.today()
     rows: list[dict[str, Any]] = []
     for plant in plants:
+        water_interval = _safe_interval(plant["water_interval_days"], 7)
+        pesticide_interval = _safe_interval(plant["pesticide_interval_days"], 30)
         last_water = _last_event_date(conn, int(plant["id"]), "water") or _created_at_date(plant)
         last_pesticide = _last_event_date(conn, int(plant["id"]), "pesticide") or _created_at_date(plant)
-        next_water = last_water + timedelta(days=int(plant["water_interval_days"]))
-        next_pesticide = last_pesticide + timedelta(days=int(plant["pesticide_interval_days"]))
+        next_water = last_water + timedelta(days=water_interval)
+        next_pesticide = last_pesticide + timedelta(days=pesticide_interval)
         rows.append(
             {
                 "id": int(plant["id"]),
@@ -236,8 +246,8 @@ def build_alerts(
     rows: list[dict[str, Any]] = []
     for plant in list_plants(conn):
         checks = [
-            ("water", int(plant["water_interval_days"]), "Watering"),
-            ("pesticide", int(plant["pesticide_interval_days"]), "Pesticide"),
+            ("water", _safe_interval(plant["water_interval_days"], 7), "Watering"),
+            ("pesticide", _safe_interval(plant["pesticide_interval_days"], 30), "Pesticide"),
         ]
         for event_type, interval_days, label in checks:
             next_due = _next_due_date(conn, plant, event_type, interval_days)
@@ -282,8 +292,8 @@ def build_calendar_events(
 
     for plant in list_plants(conn):
         checks = [
-            ("water", int(plant["water_interval_days"]), "Watering"),
-            ("pesticide", int(plant["pesticide_interval_days"]), "Pesticide"),
+            ("water", _safe_interval(plant["water_interval_days"], 7), "Watering"),
+            ("pesticide", _safe_interval(plant["pesticide_interval_days"], 30), "Pesticide"),
         ]
         for event_type, interval_days, label in checks:
             due = _next_due_date(conn, plant, event_type, interval_days)

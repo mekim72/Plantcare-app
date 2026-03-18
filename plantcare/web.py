@@ -31,6 +31,14 @@ def _shift_month(year: int, month: int, offset: int) -> tuple[int, int]:
     return value // 12, (value % 12) + 1
 
 
+def _parse_interval(raw_value: str, default: int) -> int:
+    try:
+        parsed = int(raw_value)
+    except (TypeError, ValueError):
+        return default
+    return parsed if parsed > 0 else default
+
+
 def create_app(test_config: Optional[dict] = None) -> Flask:
     project_root = Path(__file__).resolve().parent.parent
     app = Flask(__name__, template_folder="templates", static_folder="static")
@@ -182,8 +190,8 @@ def create_app(test_config: Optional[dict] = None) -> Flask:
 
             location = request.form.get("location", "").strip()
             notes = request.form.get("notes", "").strip()
-            water_interval = int(request.form.get("water_interval", "7"))
-            pesticide_interval = int(request.form.get("pesticide_interval", "30"))
+            water_interval = _parse_interval(request.form.get("water_interval", "7"), 7)
+            pesticide_interval = _parse_interval(request.form.get("pesticide_interval", "30"), 30)
             image_path = ""
             try:
                 image_path = _save_image(request.files.get("image"))
@@ -250,8 +258,11 @@ def create_app(test_config: Optional[dict] = None) -> Flask:
 
         location = request.form.get("location", "").strip()
         notes = request.form.get("notes", "").strip()
-        water_interval = int(request.form.get("water_interval", str(plant["water_interval_days"])))
-        pesticide_interval = int(request.form.get("pesticide_interval", str(plant["pesticide_interval_days"])))
+        water_interval = _parse_interval(request.form.get("water_interval", str(plant["water_interval_days"])), 7)
+        pesticide_interval = _parse_interval(
+            request.form.get("pesticide_interval", str(plant["pesticide_interval_days"])),
+            30,
+        )
         current_image = str(plant["image_path"] or "")
         remove_image = request.form.get("remove_image", "") == "1"
         new_upload = request.files.get("image")
