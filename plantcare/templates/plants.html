@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Plants | Plant Care{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ url_for('dashboard') }}">← Back to Dashboard</a></p>
+<h2>Plants</h2>
+{% if plants %}
+<ul class="cards">
+  {% for plant in plants %}
+  <li class="card">
+    {% if plant.image_path %}
+    <img class="plant-photo" src="{{ url_for('uploaded_file', filename=plant.image_path) }}" alt="{{ plant.name }}">
+    {% endif %}
+    <h3><a href="{{ url_for('plant_detail', plant_id=plant.id) }}">{{ plant.name }}</a></h3>
+    <ul>
+      <li>Species: {{ plant.species }}</li>
+      <li>Location: {{ plant.location or '-' }}</li>
+      <li>Water interval: {{ plant.water_interval_days }} day(s)</li>
+      <li>Pesticide interval: {{ plant.pesticide_interval_days }} day(s)</li>
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No plants yet.</p>
+{% endif %}
+{% endblock %}

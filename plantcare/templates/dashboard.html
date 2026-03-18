@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Plant Care{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+{% block content %}
+<h2>Dashboard</h2>
+
+<section class="panel">
+  <h3>Alerts (D-1 and Overdue)</h3>
+  {% if alerts %}
+  <ul class="event-list">
+    {% for alert in alerts %}
+    <li class="event-item {{ alert.severity }}">
+      <span class="item-main">
+        {% if alert.image_path %}
+        <img class="mini-thumb" src="{{ url_for('uploaded_file', filename=alert.image_path) }}" alt="{{ alert.plant_name }}">
+        {% endif %}
+        <a href="{{ url_for('plant_detail', plant_id=alert.plant_id) }}">{{ alert.plant_name }}</a>
+      </span>
+      <span>{{ alert.message }} ({{ alert.due_date }})</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No urgent alerts.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h3>Next Schedule</h3>
+  {% if rows %}
+  <table>
+    <thead>
+      <tr>
+        <th>Plant</th>
+        <th>Next Watering</th>
+        <th>Next Pesticide</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>
+          <span class="item-main">
+            {% if row.image_path %}
+            <img class="mini-thumb" src="{{ url_for('uploaded_file', filename=row.image_path) }}" alt="{{ row.name }}">
+            {% endif %}
+            <a href="{{ url_for('plant_detail', plant_id=row.id) }}">{{ row.name }} ({{ row.species }})</a>
+          </span>
+        </td>
+        <td class="{{ 'overdue' if row.water_overdue else 'ok' }}">{{ row.next_water }}</td>
+        <td class="{{ 'overdue' if row.pesticide_overdue else 'ok' }}">{{ row.next_pesticide }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No plants yet. Add one to start tracking.</p>
+  {% endif %}
+</section>
+{% endblock %}

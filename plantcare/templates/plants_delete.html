@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Delete Plant | Plant Care{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ url_for('dashboard') }}">&larr; Back to Dashboard</a></p>
+<h2>Delete Plant</h2>
+{% if plants %}
+<ul class="cards">
+  {% for plant in plants %}
+  <li class="card">
+    {% if plant.image_path %}
+    <img class="plant-photo" src="{{ url_for('uploaded_file', filename=plant.image_path) }}" alt="{{ plant.name }}">
+    {% endif %}
+    <h3>{{ plant.name }}</h3>
+    <p>Species: {{ plant.species }}</p>
+    <p><a href="{{ url_for('delete_plant_page', plant_id=plant.id) }}">Go to delete screen</a></p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No plants to delete.</p>
+{% endif %}
+{% endblock %}

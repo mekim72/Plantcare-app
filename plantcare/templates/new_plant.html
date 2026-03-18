@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Add Plant | Plant Care{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ url_for('dashboard') }}">← Back to Dashboard</a></p>
+<h2>Add Plant</h2>
+<form method="post" class="form" enctype="multipart/form-data">
+  <label>Name <input type="text" name="name" required></label>
+  <label>Species <input type="text" name="species" required></label>
+  <label>Location <input type="text" name="location"></label>
+  <label>Notes <textarea name="notes" rows="3"></textarea></label>
+  <label>Image <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.gif"></label>
+  <label>Water interval (days) <input type="number" name="water_interval" min="1" value="7"></label>
+  <label>Pesticide interval (days) <input type="number" name="pesticide_interval" min="1" value="30"></label>
+  <button type="submit">Create</button>
+</form>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ plant.name }} | Plant Care{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ url_for('plants') }}">&larr; Back to Plant List</a></p>
+<h2>{{ plant.name }} <small>({{ plant.species }})</small></h2>
+
+<section class="panel">
+  <h3>Plant Info</h3>
+  <div class="plant-info-grid">
+    <div class="plant-info-photo">
+      {% if plant.image_path %}
+      <img class="plant-photo" src="{{ url_for('uploaded_file', filename=plant.image_path) }}" alt="{{ plant.name }}">
+      {% else %}
+      <div class="photo-placeholder">No Image</div>
+      {% endif %}
+    </div>
+    <div class="plant-info-meta">
+      <div class="plant-meta-cards">
+        <div class="meta-card"><strong>Location</strong><span>{{ plant.location or '-' }}</span></div>
+        <div class="meta-card"><strong>Notes</strong><span>{{ plant.notes or '-' }}</span></div>
+        <div class="meta-card"><strong>Water Interval</strong><span>{{ plant.water_interval_days }} day(s)</span></div>
+        <div class="meta-card"><strong>Pesticide Interval</strong><span>{{ plant.pesticide_interval_days }} day(s)</span></div>
+      </div>
+      <div class="plant-actions">
+        <a class="action-btn edit" href="{{ url_for('edit_plant_page', plant_id=plant.id) }}">Edit</a>
+        <a class="action-btn delete" href="{{ url_for('delete_plant_page', plant_id=plant.id) }}">Delete</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h3>Care Guide</h3>
+  <ul class="care-guide-list">
+    <li><strong>Light:</strong> {{ guide.light }}</li>
+    <li><strong>Watering:</strong> {{ guide.watering }}</li>
+    <li><strong>Humidity:</strong> {{ guide.humidity }}</li>
+    <li><strong>Notes:</strong> {{ guide.notes }}</li>
+  </ul>
+</section>
+
+<section class="panel split">
+  <div>
+    <h3>Log Watering</h3>
+    <form method="post" action="{{ url_for('log_water', plant_id=plant.id) }}" class="form inline">
+      <label>Date <input type="date" name="event_date" value="{{ today }}"></label>
+      <label>Note <input type="text" name="note"></label>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+  <div>
+    <h3>Log Pesticide</h3>
+    <form method="post" action="{{ url_for('log_pesticide', plant_id=plant.id) }}" class="form inline">
+      <label>Date <input type="date" name="event_date" value="{{ today }}"></label>
+      <label>Note <input type="text" name="note"></label>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel">
+  <h3>History</h3>
+  {% if events %}
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ev in events %}
+      <tr>
+        <td>{{ ev.event_date }}</td>
+        <td>{{ ev.event_type }}</td>
+        <td>{{ ev.note or '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No events logged yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

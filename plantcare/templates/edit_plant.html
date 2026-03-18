@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Edit Plant | Plant Care{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ url_for('plant_detail', plant_id=plant.id) }}">&larr; Back to Plant Detail</a></p>
+<h2>Edit Plant: {{ plant.name }}</h2>
+{% if plant.image_path %}
+<p><img class="plant-image" src="{{ url_for('uploaded_file', filename=plant.image_path) }}" alt="{{ plant.name }}"></p>
+{% endif %}
+<form method="post" action="{{ url_for('update_plant_info', plant_id=plant.id) }}" class="form" enctype="multipart/form-data">
+  <label>Name <input type="text" name="name" value="{{ plant.name }}" required></label>
+  <label>Species <input type="text" name="species" value="{{ plant.species }}" required></label>
+  <label>Location <input type="text" name="location" value="{{ plant.location }}"></label>
+  <label>Notes <textarea name="notes" rows="3">{{ plant.notes }}</textarea></label>
+  <label>Water interval (days) <input type="number" name="water_interval" min="1" value="{{ plant.water_interval_days }}"></label>
+  <label>Pesticide interval (days) <input type="number" name="pesticide_interval" min="1" value="{{ plant.pesticide_interval_days }}"></label>
+  <label>Replace image <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.gif"></label>
+  {% if plant.image_path %}
+  <label class="inline-check"><input type="checkbox" name="remove_image" value="1"><span>Remove current image</span></label>
+  {% endif %}
+  <button type="submit">Update</button>
+</form>
+{% endblock %}

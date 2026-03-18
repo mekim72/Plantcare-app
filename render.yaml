@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: plantcare-web
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn plantcare.web:app --bind 0.0.0.0:$PORT
+    autoDeploy: true
+    envVars:
+      - key: PLANTCARE_SECRET_KEY
+        generateValue: true
+      - key: PLANTCARE_DB
+        value: /var/data/plantcare.db
+      - key: PLANTCARE_UPLOAD_DIR
+        value: /var/data/uploads
+    disk:
+      name: plantcare-data
+      mountPath: /var/data
+      sizeGB: 1

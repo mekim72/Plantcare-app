@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Daily Events | Plant Care{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ url_for('calendar_view') }}">&larr; Back to Calendar</a></p>
+<h2>Events on {{ selected_date }}</h2>
+
+{% if events %}
+<section class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th>Plant</th>
+        <th>Event</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ev in events %}
+      <tr>
+        <td><a href="{{ url_for('plant_detail', plant_id=ev.plant_id) }}">{{ ev.plant_name }}</a></td>
+        <td>{{ ev.label }}</td>
+        <td class="{{ 'overdue' if ev.overdue else 'ok' }}">{{ 'Overdue' if ev.overdue else 'Scheduled' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<section class="panel">
+  <p>No events on this date.</p>
+</section>
+{% endif %}
+{% endblock %}
+

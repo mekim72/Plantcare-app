@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Plant Care{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20260318-thumb') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <header class="topbar">
+    <h1><a href="{{ url_for('dashboard') }}">Plant Care</a></h1>
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('calendar_view') }}">Calendar</a>
+      <details class="nav-dropdown">
+        <summary>Plant Management</summary>
+        <div class="nav-dropdown-menu">
+          <a href="{{ url_for('plants') }}">View Plants</a>
+          <a href="{{ url_for('new_plant') }}">Add Plant</a>
+          <a href="{{ url_for('plants_delete_list') }}">Delete Plant</a>
+        </div>
+      </details>
+    </nav>
+  </header>
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="alerts">
+          {% for category, msg in messages %}
+            <li class="alert {{ category }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <div class="layout">
+      <aside class="sidebar">
+        <h3>My Plants</h3>
+        {% if sidebar_plants %}
+        <ul class="sidebar-list">
+          {% for p in sidebar_plants %}
+          <li>
+            <a href="{{ url_for('plant_detail', plant_id=p.id) }}">
+              {% if p.image_path %}
+              <img class="sidebar-thumb" src="{{ url_for('uploaded_file', filename=p.image_path) }}" alt="{{ p.name }}">
+              {% endif %}
+              <span>{{ p.name }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="sidebar-empty">No plants yet.</p>
+        {% endif %}
+
+        <div class="sidebar-calendar" id="sidebar-calendar">
+          <h3>Calendar</h3>
+          <p class="sidebar-month">{{ sidebar_month_title }}</p>
+          {% if sidebar_weeks %}
+          <div class="mini-calendar">
+            <div class="mini-head">Sun</div>
+            <div class="mini-head">Mon</div>
+            <div class="mini-head">Tue</div>
+            <div class="mini-head">Wed</div>
+            <div class="mini-head">Thu</div>
+            <div class="mini-head">Fri</div>
+            <div class="mini-head">Sat</div>
+            {% for week in sidebar_weeks %}
+              {% for day in week %}
+                {% if day == 0 %}
+                <div class="mini-day empty"></div>
+                {% else %}
+                <button type="button" class="mini-day-btn" data-day="{{ day }}">
+                  <div class="mini-day {% if day == sidebar_today_day %}today{% endif %}">
+                    <div class="day-num">{{ day }}</div>
+                    {% if sidebar_day_events.get(day) %}
+                    <div class="day-indicator has-event" title="Has events"></div>
+                    {% endif %}
+                  </div>
+                </button>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </div>
+          {% endif %}
+          <div class="sidebar-day-detail" id="sidebar-day-detail">
+            <h4>Select a date</h4>
+            <p>Click a day to see detailed events.</p>
+          </div>
+        </div>
+      </aside>
+      <section class="content">
+        {% block content %}{% endblock %}
+      </section>
+    </div>
+  </main>
+  <script id="sidebar-events-json" type="application/json">{{ sidebar_day_events|tojson }}</script>
+  <script>
+    (function () {
+      const year = {{ sidebar_year or 0 }};
+      const month = {{ sidebar_month or 0 }};
+      const dataTag = document.getElementById("sidebar-events-json");
+      const detail = document.getElementById("sidebar-day-detail");
+      if (!dataTag || !detail || !year || !month) return;
+
+      let eventsByDay = {};
+      try {
+        eventsByDay = JSON.parse(dataTag.textContent || "{}");
+      } catch (_) {
+        eventsByDay = {};
+      }
+
+      function renderDay(day) {
+        const dd = String(day).padStart(2, "0");
+        const mm = String(month).padStart(2, "0");
+        const iso = `${year}-${mm}-${dd}`;
+        const items = eventsByDay[String(day)] || [];
+        if (!items.length) {
+          detail.innerHTML = `<h4>${iso} Events</h4><p>No events on this date.</p>`;
+          return;
+        }
+        const rows = items.map((ev) => {
+          const label = ev.label || (ev.event_type === "water" ? "Watering" : "Pesticide");
+          return `<li><a href="/plants/${ev.plant_id}">${ev.plant_name}</a><span class="ev-type ${ev.event_type}">${label}</span></li>`;
+        }).join("");
+        detail.innerHTML = `<h4>${iso} Events</h4><ul>${rows}</ul>`;
+      }
+
+      document.querySelectorAll(".mini-day-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const day = Number(btn.getAttribute("data-day"));
+          if (!day) return;
+          renderDay(day);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

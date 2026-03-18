@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Calendar | Plant Care{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ url_for('dashboard') }}">← Back to Dashboard</a></p>
+<div class="calendar-head">
+  <h2>Calendar: {{ title }}</h2>
+  <div class="calendar-nav">
+    <a href="{{ url_for('calendar_view', year=prev_year, month=prev_month) }}">Previous</a>
+    <a href="{{ url_for('calendar_view') }}">Current Month</a>
+    <a href="{{ url_for('calendar_view', year=next_year, month=next_month) }}">Next</a>
+  </div>
+</div>
+
+<section class="panel">
+  {% if grouped %}
+  <ul class="event-list">
+    {% for day, events in grouped.items() %}
+    <li class="event-day">
+      <h3>{{ day }}</h3>
+      <ul>
+        {% for ev in events %}
+        <li class="event-item {{ 'overdue' if ev.overdue else 'ok' }}">
+          <a href="{{ url_for('plant_detail', plant_id=ev.plant_id) }}">{{ ev.plant_name }}</a>
+          <span>{{ ev.label }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No scheduled items in this month.</p>
+  {% endif %}
+</section>
+{% endblock %}
