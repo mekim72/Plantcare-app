@@ -12,5 +12,5 @@ services:
       - key: PLANTCARE_DB
         value: /var/data/plantcare.db
       - key: PLANTCARE_UPLOAD_DIR
-        value: /var/data/uploads
+        value: /tmp/uploads
 
